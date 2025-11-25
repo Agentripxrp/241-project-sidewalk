@@ -40,13 +40,13 @@ This class represents a basic parser for sidewalk information. Its purpose is to
 
 This class is a parser specifically designed to parse CSV files for street information. Its purpose is to read a CSV file containing street data and create a graph representation of that data. It utilizes a Scanner class to read the file, maps CSV headers to column indices, and constructs a graph representation of the data by creating 'Sidewalk' objects and adding edges between nodes. Below is an example of what you will find in the given CSV file. This class has been completed for you.
 
-| origin |	dest |	distance |
-| ------ | ----- | --------- |
-| -122.310133, 47.6164493 | -122.3095009, 47.6164515 |	0.92414182 |
-| -122.306149053447, 47.6172551505485 | -122.3061575, 47.617266 |	0.999841564 |
-| -122.3058297, 47.6171284 |	-122.3059664, 47.6171369 |	0.999841564 |
-| -122.2902089, 47.6250006 | -122.2901079, 47.6250004 |	0.268941421 |
-| -122.2895571, 47.6249996 | -122.2892349, 47.6249969 |	0.5 |
+| originlat | originlong |	destlat | destlong | distance |
+| --------- | ---------- | -------- | -------- | -------- |
+| -122.310133 | 47.6164493 | -122.3095009 | 47.6164515 | 0.92414182 |
+| -122.306149053447 | 47.6172551505485 | -122.3061575 | 47.617266 |	0.999841564 |
+| -122.3058297 | 47.6171284 |	-122.3059664 | 47.6171369 |	0.999841564 |
+| -122.2902089 | 47.6250006 | -122.2901079 | 47.6250004 | 0.268941421 |
+| -122.2895571 | 47.6249996 | -122.2892349 | 47.6249969 | 0.5 |
 
 ## 3. Graph
 
@@ -75,35 +75,28 @@ This class provides an implementation of Dijkstra's Single-Source Shortest Paths
 
 - You should test your code using both the JUnit test cases provided and the command line program implemented in the main method.
 - Three simple graphs (Simple0.txt, Simple1.txt, Simple2.txt) are provided. Run the algorithm by hand to determine the correct answers for these graphs and verify that your implementation arrives at the correct paths and path lengths.
-- The sample graphs given are not sufficient to test you algorithm's correctness. It's your responsibility to write tests that cover all possible cases that the algorithm could encounter.
+- The sample graphs given are not sufficient to test your algorithm's correctness. It's your responsibility to write tests that cover all possible cases that the algorithm could encounter.
 - Make sure your algorithm handles edge cases correctly, including behaving as specified when the destination node is unreachable. Test this using the simplest possible test cases
   - For example, this edge case could be tested using a two-node graph with a directed edge from destination to origin.
 - The BasicParser class parses a simple edge list from a text file, such as Simple1.txt and Simple2.txt. The DBParser class parses a CSV file, such as DBCrop.csv. Feel free to write and test using additional graph files in these formats. You may get more CSV files from the Sidewalk API. You provide lat/lng bounds for the ares that you want to query.
-- If you choose to test your code on new CSV files from Project Sidewalk, some cleaning will be needed. Instructions for cleaning in MS Excel:
-  1. Split the coordinates in the "coordinates" column to extract "origin" and "destination". Consider the first coordinate as the "origin", the second coordinate as the "destination", and ignore any extra coordinates.
-  2. Rename the column headers accordingly. The below steps will be useful:
-    a. Select the cell or column that contains the text you want to split
-    b. Select Data > Text to Columns
-    c. In the Convert Text to Columns Wizard, select Delimited > Next
-    d. Select the Delimiters for your data. Use ')' as a delimiter
-    e. Select Next
-    f. Select the Destination in your worksheet which is where you want the split data to appear
-    g. Select the accessibility attribute you want to consider as the "distance" for your shortest path algorithm.
-    h. Rename your selected column as "distance". In the CSV sample file given to you, "distance" is considered to be the access score.
+- If you choose to test your code on new CSV files from Project Sidewalk (**not required**), some cleaning will be needed.
+  1. Split the coordinates in the "coordinates" column to extract "originlat" / "originlong" and "destlat"/ "destlong".
+  2. Select the accessibiliy attribute you want to use as distance, split into its own column named "distance".
+  3. In Excel, you can use the [Convert Text to Columns Wizard](https://support.microsoft.com/en-us/office/split-text-into-different-columns-with-the-convert-text-to-columns-wizard-30b14928-5550-41f5-97ca-7a3e9c363ed7) to perform the necessary splitting.
 
-# Project Plan and Reflection
+# Assignment Submission
 
-Each person must write a reflection in a new file named `reflection.md`.
+Fork this repository on Github to create your own version of the repository. Submit the assignment by uploading either a ZIP file of your code, or a link to your public GitHub repository.
+
+## Project Reflection
+
+Before submission, each person must write a reflection in a new file named `reflection.md`.
 
 `reflection.md` should include the following information:
 
 - Declare/discuss any aspects of your code that are not working. What are your intuitions about why they are not working? Acknowledge and discuss any parts of the program that appear to be inefficient.
 - What are some of the most important lessons you learned while working on this assignment? Why do you think so?
 - What was the most challenging aspect of this assignment? Why?
-
-# Assignment Submission
-
-Fork this repository on Github to create your own version of the repository. Submit the assignment by uploading either a ZIP file of your code, or a link to your public GitHub repository.
 
 # Contributors
 
