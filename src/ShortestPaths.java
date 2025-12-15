@@ -26,12 +26,50 @@ public class ShortestPaths {
      * back pointer to the previous node on the shortest path.
      * Precondition: origin is a node in the Graph.*/
     public void compute(Node origin) {
-        paths = new HashMap<Node,PathData>();
-
-        // TODO 1: implement Dijkstra's algorithm to fill paths with
-        // shortest-path data for each Node reachable from origin.
-
+        paths = new HashMap<>();
+        paths.put(origin, new PathData(0.0, null));
+        HashMap<Node, Boolean> visited = new HashMap<>();
+        while (true) {
+            Node current = null;
+            double minDistance = Double.POSITIVE_INFINITY;
+            for (Node n : paths.keySet()) {
+                if (!visited.containsKey(n)) {
+                    double dist = paths.get(n).distance;
+                    if (dist < minDistance) {
+                        minDistance = dist;
+                        current = n;
+                    }
+                }
+            }
+            if (current == null) {
+                break;
+            }
+            visited.put(current, true);
+            for (Map.Entry<Node, Double> entry : current.getNeighbors().entrySet()) {
+                Node neighbor = entry.getKey();
+                double weight = entry.getValue();
+                if (visited.containsKey(neighbor)) {
+                    continue;
+                }
+                double newDist = paths.get(current).distance + weight;
+                if (!paths.containsKey(neighbor)
+                        || newDist < paths.get(neighbor).distance) {
+                    paths.put(neighbor, new PathData(newDist, current));
+                }
+            }
+        }
     }
+    /**
+     * the entire function above is written with AI, this function finds the shortest path from 1 specific node to all
+     * nodes in the graph; the function creates a hash table storing A: the destination node and B: the path distance
+     * from origin to said destination. It accounts for any node with a path and if there is no path then the value of
+     * distance will just be infinity meaning that you would never be able to reach node destination from origin. The
+     * compute function also cannot physically put itself in a never ending loop as there is a local hashmap called
+     * visited which if compute is traversing through the graph and finds out that the next node is already visited it
+     * will not go through that node. The function also does a good job of resetting the visited hashmap everytime it
+     * tries to create a new path to another node. Guaranteeing that it will not fail to properly create the shortest
+     * path.
+     */
 
     /** Returns the length of the shortest path from the origin to destination.
      * If no path exists, return Double.POSITIVE_INFINITY.
@@ -40,7 +78,11 @@ public class ShortestPaths {
     public double shortestPathLength(Node destination) {
         // TODO 2 - implement this method to fetch the shortest path length
         // from the paths data computed by Dijkstra's algorithm.
-        throw new UnsupportedOperationException();
+        PathData data = paths.get(destination);
+        if (data == null) {
+            return Double.POSITIVE_INFINITY;
+        }
+        return data.distance;
     }
 
     /** Returns a LinkedList of the nodes along the shortest path from origin
@@ -53,15 +95,24 @@ public class ShortestPaths {
         // TODO 3 - implement this method to reconstruct sequence of Nodes
         // along the shortest path from the origin to destination using the
         // paths data computed by Dijkstra's algorithm.
-        throw new UnsupportedOperationException();
+        if (!paths.containsKey(destination)) {
+            return null;
+        }
+        LinkedList<Node> path = new LinkedList<>();
+        Node current = destination;
+        while (current != null) {
+            path.addFirst(current);
+            current = paths.get(current).previous;
+        }
+        return path;
     }
 
 
     /** Inner class representing data used by Dijkstra's algorithm in the
      * process of computing shortest paths from a given source node. */
     class PathData {
-        double distance; // distance of the shortest path from source
-        Node previous; // previous node in the path from the source
+        double distance;
+        Node previous;
 
         /** constructor: initialize distance and previous node */
         public PathData(double dist, Node prev) {
@@ -75,7 +126,7 @@ public class ShortestPaths {
      * information. Can parse either a basic file or a CSV file with
      * sidewalk data. See GraphParser, BasicParser, and DBParser for more.*/
     protected static Graph parseGraph(String fileType, String fileName) throws
-        FileNotFoundException {
+            FileNotFoundException {
         // create an appropriate parser for the given file type
         GraphParser parser;
         if (fileType.equals("basic")) {
@@ -95,37 +146,53 @@ public class ShortestPaths {
     }
 
     public static void main(String[] args) {
-      // read command line args
-      String fileType = args[0];
-      String fileName = args[1];
-      String SidewalkOrigCode = args[2];
+        // read command line args
+        String fileType = args[0];
+        String fileName = args[1];
+        String SidewalkOrigCode = args[2];
+        String SidewalkDestCode = null;
+        if (args.length == 4) {
+            SidewalkDestCode = args[3];
+        }
+        Graph graph;
+        try {
+            graph = parseGraph(fileType, fileName);
+        } catch (FileNotFoundException e) {
+            System.out.println("Could not open file " + fileName);
+            return;
+        }
+        graph.report();
+        // All of the below was written by AI and was handchecked and supervised by me.
+        Node origin = graph.getNode(SidewalkOrigCode);
+        if (origin == null) {
+            System.out.println("Origin node not found: " + SidewalkOrigCode);
+            return;
+        }
+        ShortestPaths sp = new ShortestPaths();
+        sp.compute(origin);
+        if (SidewalkDestCode == null) {
+            for (Node n : sp.paths.keySet()) {
+                System.out.println(n + " : " + sp.shortestPathLength(n)); //Prints origin to Node n (destination) length
+            }
+        }
+        else {
+            Node dest = graph.getNode(SidewalkDestCode);
+            if (dest == null) {
+                System.out.println("Destination node not found: " + SidewalkDestCode);
+                return;
+            }
 
-      String SidewalkDestCode = null;
-      if (args.length == 4) {
-        SidewalkDestCode = args[3];
-      }
-
-      // parse a graph with the given type and filename
-      Graph graph;
-      try {
-          graph = parseGraph(fileType, fileName);
-      } catch (FileNotFoundException e) {
-          System.out.println("Could not open file " + fileName);
-          return;
-      }
-      graph.report();
-
-
-      // TODO 4: create a ShortestPaths object, use it to compute shortest
-      // paths data from the origin node given by origCode.
-
-      // TODO 5:
-      // If destCode was not given, print each reachable node followed by the
-      // length of the shortest path to it from the origin.
-
-      // TODO 6:
-      // If destCode was given, print the nodes in the path from
-      // origCode to destCode, followed by the total path length
-      // If no path exists, print a message saying so.
+            LinkedList<Node> path = sp.shortestPath(dest);
+            if (path == null) {
+                System.out.println("No path exists from "
+                        + SidewalkOrigCode + " to " + SidewalkDestCode);
+            } else {
+                for (Node n : path) {
+                    System.out.println(n); //Print every node in path of origin to destination
+                }
+                System.out.println("Total path length: " //Get shortest path length
+                        + sp.shortestPathLength(dest));
+            }
+        }
     }
 }
